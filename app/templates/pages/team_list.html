@@ -1,0 +1,75 @@
+{% extends '_base.html' %}
+
+{% block title %}Teams | MyTeams{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .badge {
+            width: 7rem;
+        }
+
+        .form-control {
+            height: auto;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<form action="{% url 'team_list' %}" method="post">
+    {% csrf_token %}
+    <div class="container p-0">
+        <div class="row">
+            <div class="col-11 mb-2">
+                <b>My Teams</b>:
+                {% with user_teams=user.teams.all %}
+                {% for team in user_teams %}
+                {% ifchanged team.league %}
+                {% if forloop.first %}
+                    <span class="mr-1">{{ team }}</span>
+                {% else %}
+                    |&ensp;<span class="mr-1">{{ team }}</span>
+                {% endif %}
+                {% else %}
+                <span class="mr-1">{{ team }}</span>
+                {% endifchanged %}
+                {% endfor %}
+            </div>
+            <div class="col-1 ml-auto">
+                <button id="team-select" type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    {% for league in leagues %}
+        {% ifchanged league.sports %}
+            <hr class="mb-2">
+            <div class="badge badge-dark text-wrap mb-2">{{ league.sports }}</div><br>
+        {% endifchanged %}
+
+        <b>{{ league }}</b> {{ league.teams.count }}<br>
+
+        <div class="container">
+            <div class="form-check">
+                <div class="row mb-3">
+                    {% for team  in league.teams.all %}
+                        {% if team in user_teams %}
+                            <div class="col-2 p-0 m-0">
+                                <input class="form-check-input form-control" type="checkbox"
+                                       name="team_pk"
+                                       value="{{ team.pk }}" id="team-select" checked>
+                                <label class="form-check-label" for="team-select">{{ team }}</label></div>
+                        {% else %}
+                            <div class="col-2 p-0 m-0">
+                                <input class="form-check-input form-control" type="checkbox"
+                                       name="team_pk"
+                                       value="{{ team.pk }}" id="team-select">
+                                <label class="form-check-label" for="team-select">{{ team }}</label></div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</form>
+{% endwith %}
+{% endblock content %}

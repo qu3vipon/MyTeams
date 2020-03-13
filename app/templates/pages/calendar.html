@@ -1,0 +1,71 @@
+{% extends '_base.html' %}
+
+{% block title %}Calendar | MyTeams{% endblock %}
+
+{% block extra_css %}
+    <style>
+        li {
+            list-style-type: none;
+            font-size: .9em;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<h3 class="text-center mb-3">{{ calendar.title }}</h3>
+<table class="table table-bordered">
+    {% for match in matches %}
+        {{ match }}<br>
+    {% endfor %}
+    <thead>
+    <tr class="table-info">
+        {% for header in calendar.weekheader %}
+            {% if header in 'Sat' or header in 'Sun' %}
+                <th scope="col" class="text-center text-danger">{{ header }}</th>
+            {% else %}
+                <th scope="col" class="text-center">{{ header }}</th>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for week in calendar.body %}
+    <tr>
+        {% for day in week %}
+        {% ifequal day.0 0 %}
+        <td></td>
+        {% else %}
+        <td height="auto" class="p-0 pl-1 pr-1">
+            {% if forloop.counter == 6 or forloop.counter == 7 %}
+                <span class="ml-2 text-danger">{{ day.0 }}</span>
+            {% else %}
+                <span class="ml-2">{{ day.0 }}</span>
+            {% endif %}
+
+            {% ifnotequal day.1 0 %}
+                {% for m in day.1 %}
+                    <ul class="list-group">
+                        <span class="badge badge-dark badge-pill mt-1">{{ m.team_left.league }} {{ m.datetime.time }}</span>
+                        <li class="text-center">
+                            {% if user in m.team_left.supporter.all and user in m.team_right.supporter.all %}
+                                {{ m.team_left }}:{{ m.team_right }}
+                            {% else %}
+                                {% if user in m.team_left.supporter.all %}
+                                    {{ m.team_left }}:<span class="text-muted">{{ m.team_right }}</span>
+                                {% elif user in m.team_right.supporter.all %}
+                                    <span class="text-muted">{{ m.team_left }}</span>:{{ m.team_right }}
+                                {% endif %}
+                            {% endif %}
+                        </li>
+                    </ul>
+                {% endfor %}
+            {% endifnotequal %}
+        </td>
+        {% endifequal %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends '_base.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block title %}Home | MyTeams{% endblock title %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        {% if user.teams.all %}
+            {% with user_teams=user.teams.all %}
+                <div class="row justify-content-center">
+                    <div class="col-9">
+                        <div class="card mt-5">
+                            <div class="card-body">
+                                <h2 class="text-dark m-0 text-center">오늘의 경기</h2>
+                                <div class="d-flex"><span class="ml-auto mr-4 font-weight-light">*표시: 홈팀</span></div>
+                                {% if matches_today %}
+                                    {% for match in matches_today %}
+                                        <div class="row m-0 mb-1">
+                                            <div class="col-2 m-0 p-0 text-center">
+                                                <span>{{ match.datetime.time|time:"A H:i" }}</span>
+                                            </div>
+                                            <div class="col-3 m-0 p-0">
+                                                <span>{{ match.place }}</span>
+                                            </div>
+                                            <div class="col-2 m-0 p-0">
+                                                <span>{{ match.team_left.league }}</span>
+                                            </div>
+                                            {% if match.team_left.league.name in home_left %}
+                                                {% if match.team_left in user_teams %}
+                                                    <div class="col m-0 p-0">
+                                                        <span>{{ match.team_left }}*</span>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="col m-0 p-0 text-secondary">
+                                                        <span>{{ match.team_left }}*</span>
+                                                    </div>
+                                                {% endif %}
+                                                {% if match.team_right in user_teams %}
+                                                    <div class="col m-0 p-0">
+                                                        <span>{{ match.team_right }}</span>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="col m-0 p-0 text-secondary">
+                                                        <span>{{ match.team_right }}</span>
+                                                    </div>
+                                                {% endif %}
+                                            {% elif match.team_left.league.name in home_right %}
+                                                {% if match.team_left in user_teams %}
+                                                    <div class="col m-0 p-0">
+                                                        <span>{{ match.team_left }}</span>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="col m-0 p-0 text-secondary">
+                                                        <span>{{ match.team_left }}</span>
+                                                    </div>
+                                                {% endif %}
+                                                {% if match.team_right in user_teams %}
+                                                    <div class="col m-0 p-0">
+                                                        <span>{{ match.team_right }}*</span>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="col m-0 p-0 text-secondary">
+                                                        <span>{{ match.team_right }}*</span>
+                                                    </div>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <h4 class="text-danger">경기가 없습니다.</h4></div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endwith %}
+        {% else %}
+            <div class="row justify-content-center">
+                <div class="col-9">
+                    <div class="card mt-5">
+                        <div class="card-body">
+                            <h2 class="text-dark mb-4 text-center">MyTeam이 없습니다.</h2>
+                            <div class="row">
+                                <div class="col text-center">
+                                    <h4 class="text-danger">응원하는 팀을 골라주세요!</h4></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+
+    {% else %}
+        <div class="row justify-content-center">
+            <div class="col-6">
+                <div class="card mt-5">
+                    <div class="card-body text-center">
+                        <h3 class="text-dark">로그인 후 이용 가능합니다.</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-3">
+            <a href="{% url 'account_login' %}" class="btn btn-dark mr-2">Log In</a>
+            <a href="{% url 'account_signup' %}" class="btn btn-primary">Sign Up</a>
+        </div>
+    {% endif %}
+
+{% endblock content %}
